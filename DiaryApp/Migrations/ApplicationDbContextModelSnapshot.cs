@@ -44,6 +44,29 @@ namespace DiaryApp.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("DiaryEntries");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Content = "Went hiking to Whistlers Mountain",
+                            Created = new DateTime(2024, 10, 28, 1, 29, 58, 911, DateTimeKind.Local).AddTicks(4335),
+                            Title = "Went Hiking"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Content = "Went shopping to Hinton",
+                            Created = new DateTime(2024, 10, 28, 1, 29, 58, 911, DateTimeKind.Local).AddTicks(4579),
+                            Title = "Went Shopping"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Content = "Went driving to Jasper Driver's school",
+                            Created = new DateTime(2024, 10, 28, 1, 29, 58, 911, DateTimeKind.Local).AddTicks(4583),
+                            Title = "Went Driving"
+                        });
                 });
 #pragma warning restore 612, 618
         }
