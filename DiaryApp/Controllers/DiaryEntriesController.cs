@@ -1,12 +1,19 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using DiaryApp.Data;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace DiaryApp.Controllers;
 
 public class DiaryEntriesController : Controller
 {
+    private readonly ApplicationDbContext _context;
+
+    public DiaryEntriesController(ApplicationDbContext context) => _context = context;
     // GET
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        return View();
+        var entries = await _context.DiaryEntries.ToListAsync();
+        
+        return View(entries);
     }
 }
