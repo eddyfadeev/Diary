@@ -16,4 +16,9 @@ public class DiaryEntriesController : Controller
         
         return View(entries);
     }
+
+    public IActionResult Create()
+    {
+        return View();
+    }
 }
