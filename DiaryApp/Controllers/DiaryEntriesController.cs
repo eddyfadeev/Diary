@@ -27,11 +27,6 @@ public class DiaryEntriesController : Controller
     [HttpPost]
     public async Task<IActionResult> Create(DiaryEntry entry)
     {
-        // if (!ModelState.IsValid)
-        // {
-        //     return View(entry);
-        // }
-        
         await _context.AddAsync(entry);
         await _context.SaveChangesAsync();
 
