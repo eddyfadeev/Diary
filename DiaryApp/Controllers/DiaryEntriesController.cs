@@ -1,4 +1,5 @@
 ﻿using DiaryApp.Data;
+using DiaryApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,8 +18,23 @@ public class DiaryEntriesController : Controller
         return View(entries);
     }
 
+    [HttpGet]
     public IActionResult Create()
     {
         return View();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Create(DiaryEntry entry)
+    {
+        // if (!ModelState.IsValid)
+        // {
+        //     return View(entry);
+        // }
+        
+        await _context.AddAsync(entry);
+        await _context.SaveChangesAsync();
+
+        return RedirectToAction("Index");
     }
 }
