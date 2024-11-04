@@ -69,8 +69,8 @@ public class DiaryEntriesController : Controller
 
         return RedirectToAction("Index");
     }
-
-    //[HttpPost]
+    
+    [HttpPost]
     public async Task<IActionResult> Delete(int? id)
     {
         if (id is null or 0)
