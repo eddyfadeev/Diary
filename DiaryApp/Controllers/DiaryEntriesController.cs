@@ -1,19 +1,21 @@
-﻿using DiaryApp.Data;
-using DiaryApp.Models;
+﻿using DiaryApp.Models;
+using DiaryApp.Repository;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace DiaryApp.Controllers;
 
 public class DiaryEntriesController : Controller
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IDiaryEntryRepository _repository;
 
-    public DiaryEntriesController(ApplicationDbContext context) => _context = context;
+    public DiaryEntriesController(IDiaryEntryRepository repository) => 
+        _repository = repository;
     // GET
     public async Task<IActionResult> Index()
     {
-        var entries = await _context.DiaryEntries.ToListAsync();
+        var entries = await _repository.GetAsync(
+            orderBy: query => 
+                query.OrderByDescending(entry => entry.Created));
         
         return View(entries);
     }
@@ -32,8 +34,7 @@ public class DiaryEntriesController : Controller
             return View(entry);
         }
         
-        await _context.DiaryEntries.AddAsync(entry);
-        await _context.SaveChangesAsync();
+        await _repository.CreateAsync(entry);
 
         return RedirectToAction("Index");
     }
@@ -45,8 +46,8 @@ public class DiaryEntriesController : Controller
         {
             return NotFound();
         }
-        
-        var entry = await _context.DiaryEntries.FindAsync(id);
+
+        var entry = await _repository.GetByIdAsync(id.Value);
 
         if (entry is null)
         {
@@ -64,8 +65,7 @@ public class DiaryEntriesController : Controller
             return View(entry);
         }
 
-        await Task.Run(() => _context.DiaryEntries.Update(entry));
-        await _context.SaveChangesAsync();
+        await _repository.UpdateAsync(entry);
 
         return RedirectToAction("Index");
     }
@@ -78,15 +78,7 @@ public class DiaryEntriesController : Controller
             return NotFound();
         }
 
-        var entity = await _context.DiaryEntries.FindAsync(id);
-
-        if (entity is null)
-        {
-            return NotFound();
-        }
-
-        await Task.Run(() => _context.Remove(entity));
-        await _context.SaveChangesAsync();
+        await _repository.DeleteAsync(id.Value);
 
         return RedirectToAction("Index");
     }

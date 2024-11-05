@@ -1,4 +1,5 @@
 ﻿using DiaryApp.Data;
+using DiaryApp.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace DiaryApp;
@@ -18,6 +19,8 @@ public class Startup
             options => options.UseSqlServer(
                 _configuration.GetConnectionString("DefaultConnection")
             ));
+        
+        services.AddRepository();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment environment)
@@ -42,7 +45,7 @@ public class Startup
         {
             endpoints.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}")
+                pattern: "{controller=DiaryEntries}/{action=Index}/{id?}")
                 .WithStaticAssets();
             endpoints.MapFallbackToController("Error", "Home");
         });

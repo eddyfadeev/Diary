@@ -1,4 +1,5 @@
 ﻿using DiaryApp.Models;
+using DiaryApp.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
@@ -22,28 +23,6 @@ public class ApplicationDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<DiaryEntry>().HasData(
-            new DiaryEntry
-            {
-                Id = 1,
-                Title = "Went Hiking",
-                Content = "Went hiking to Whistlers Mountain",
-                Created = DateTime.Now
-            },
-            new DiaryEntry
-            {
-                Id = 2,
-                Title = "Went Shopping",
-                Content = "Went shopping to Hinton",
-                Created = DateTime.Now
-            },
-            new DiaryEntry
-            {
-                Id = 3,
-                Title = "Went Driving",
-                Content = "Went driving to Jasper Driver's school",
-                Created = DateTime.Now
-            }
-            );
+        modelBuilder.Entity<DiaryEntry>().HasData(DataSeedService.GetSeedData());
     }
 }
