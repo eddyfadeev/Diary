@@ -1,5 +1,5 @@
 ﻿@using DiaryApp.Enums
-@model List<DiaryEntry>
+@model PaginatedList<DiaryEntry>
 
 @{
     ViewData["Title"] = "Diary Entries";
@@ -18,8 +18,19 @@
                 Create a new entry
             </a>
         </div>
-        <div class="col-6 text-start">
+        <div class="col-4 text-start">
             <h2>Diary Entries</h2>
+        </div>
+        <div class="col-4 pt-2">
+            <form asp-action="Index" method="get">
+                <div class="form-actions no-color">
+                    <p>
+                        <label>Filter: <input type="text" name="SearchString" value="@ViewData["AppliedFilter"]" /></label>
+                        <input type="submit" value="Search" class="btn btn-info btn-sm" />
+                        <a asp-action="Index" class="btn btn-sm btn-dark">Reset</a>
+                    </p>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -35,15 +46,15 @@
                     Date
                     @if (@ViewData["SortOrder"] is SortingOrder.Descending)
                     {
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-up-fill" viewBox="0 0 16 16">
-                        <path d="m7.247 4.86-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z"/>
-                    </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-up-fill" viewBox="0 0 16 16">
+                            <path d="m7.247 4.86-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z"/>
+                        </svg>
                     }
                     else
                     {
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-down-fill" viewBox="0 0 16 16">
-                        <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
-                    </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-down-fill" viewBox="0 0 16 16">
+                            <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
+                        </svg>
                     }
                 </a>
                 
@@ -80,3 +91,23 @@
         </tbody>
     </table>
 </div>
+
+@{
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+}
+
+<a asp-action="Index"
+   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-pageNumber="@(Model.PageIndex - 1)"
+   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   class="btn btn-outline-info @prevDisabled">
+    Previous
+</a>
+<a asp-action="Index"
+   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-pageNumber="@(Model.PageIndex + 1)"
+   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   class="btn btn-outline-info @nextDisabled">
+    Next
+</a>

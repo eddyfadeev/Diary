@@ -12,6 +12,7 @@ public class DiaryEntry
     public string Title { get; set; } = string.Empty;
     
     [Required(ErrorMessage = "Please enter how was your day")]
+    [StringLength(100)]
     public string Content { get; set; } = string.Empty;
     
     [Required(ErrorMessage = "Please, specify the date of the entry")] 
