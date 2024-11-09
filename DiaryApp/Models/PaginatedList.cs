@@ -1,4 +1,4 @@
-﻿namespace DiaryApp;
+﻿namespace DiaryApp.Models;
 
 public class PaginatedList<T> : List<T>
 {
