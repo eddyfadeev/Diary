@@ -11,7 +11,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <form asp-action="Delete" asp-controller="DiaryEntries" asp-route-id="@Model.Id" method="post">
+                <form asp-action="Delete" asp-controller="Home" asp-route-id="@Model.Id" method="post">
                     <button type="submit" class="btn btn-danger">
                         Delete
                     </button>
