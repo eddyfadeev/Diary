@@ -16,12 +16,12 @@ public class HomeController : Controller
     
     public async Task<IActionResult> Index(
         int? page,
-        SortingOrder sort = SortingOrder.Descending,
+        SortingOrder sortBy = SortingOrder.Descending,
         string? search = null)
     {
         const int pageSize = 10;
         
-        ViewData["SortOrder"] = sort;
+        ViewData["SortOrder"] = sortBy;
 
         if (string.IsNullOrWhiteSpace(search) && page is null)
         {
@@ -29,29 +29,18 @@ public class HomeController : Controller
         }
 
         ViewData["AppliedFilter"] = search ?? string.Empty;
-
-        Func<IQueryable<DiaryEntry>, IOrderedQueryable<DiaryEntry>> sortQuery = 
-            sort is SortingOrder.Ascending
-                ? q => q.OrderBy(e => e.Created)
-                : q => q.OrderByDescending(e => e.Created);
-        
-        Expression<Func<DiaryEntry, bool>>? filterQuery = 
-            string.IsNullOrWhiteSpace(search) 
-                ? null 
-                : entry => entry.Content.Contains(search) || entry.Title.Contains(search);
         
         var entries = await _repository.GetAsync(
-            filter: filterQuery,
-            orderBy: sortQuery
+            filter: GetFilterExpression(search),
+            orderBy: GetSortPredicate(sortBy)
         );
         
-        Console.WriteLine($"Page: {page}, Search: {search}, Sort: {sort}");
-        
-        var paginatedList = PaginatedList<DiaryEntry>.Create(
-            entries, 
-            page ?? 1, 
-            pageSize
-        );
+        var paginatedList = 
+            PaginatedList<DiaryEntry>.Create(
+                entries, 
+                page ?? 1, 
+                pageSize
+            );
         
         return View(paginatedList);
     }
@@ -124,4 +113,15 @@ public class HomeController : Controller
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
+    
+    private static Func<IQueryable<DiaryEntry>, IOrderedQueryable<DiaryEntry>> 
+        GetSortPredicate(SortingOrder sortingOrder) =>
+        sortingOrder is SortingOrder.Ascending
+            ? q => q.OrderBy(e => e.Created)
+            : q => q.OrderByDescending(e => e.Created);
+    
+    private static Expression<Func<DiaryEntry, bool>>? GetFilterExpression(string? searchQuery) =>
+        string.IsNullOrWhiteSpace(searchQuery) 
+            ? null 
+            : entry => entry.Content.Contains(searchQuery) || entry.Title.Contains(searchQuery);
 }
