@@ -1,4 +1,6 @@
-﻿using DiaryApp.Models;
+﻿using System.Linq.Expressions;
+using DiaryApp.Enums;
+using DiaryApp.Models;
 using DiaryApp.Repository;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,13 +13,46 @@ public class DiaryEntriesController : Controller
     public DiaryEntriesController(IDiaryEntryRepository repository) => 
         _repository = repository;
     // GET
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(
+        SortingOrder? sortOrder,
+        string? currentFilter,
+        string? searchString,
+        int? pageNumber)
     {
-        var entries = await _repository.GetAsync(
-            orderBy: query => 
-                query.OrderByDescending(entry => entry.Created));
+        const int pageSize = 10;
         
-        return View(entries);
+        ViewData["SortOrder"] = 
+            sortOrder is SortingOrder.Descending or null
+            ? SortingOrder.Ascending 
+            : SortingOrder.Descending;
+
+        if (!string.IsNullOrEmpty(searchString))
+        {
+            pageNumber = 1;
+        }
+        else
+        {
+            searchString = currentFilter;
+        }
+
+        ViewData["AppliedFilter"] = searchString ?? string.Empty;
+
+        Func<IQueryable<DiaryEntry>, IOrderedQueryable<DiaryEntry>> sortQuery = 
+            sortOrder is null or SortingOrder.Descending
+                ? q => q.OrderByDescending(e => e.Created)
+                : q => q.OrderBy(e => e.Created); 
+        
+        Expression<Func<DiaryEntry, bool>>? filterQuery = 
+            string.IsNullOrWhiteSpace(searchString) 
+                ? default 
+                : entry => entry.Content.Contains(searchString) || entry.Title.Contains(searchString);
+        
+        var entries = await _repository.GetAsync(
+            filter: filterQuery,
+            orderBy: sortQuery
+        );
+        
+        return View(PaginatedList<DiaryEntry>.CreateAsync(entries, pageNumber ?? 1, pageSize));
     }
 
     [HttpGet]

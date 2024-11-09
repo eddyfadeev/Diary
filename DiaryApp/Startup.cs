@@ -25,7 +25,7 @@ public class Startup
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment environment)
     {
-        if (environment.IsDevelopment())
+        if (!environment.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();
         }

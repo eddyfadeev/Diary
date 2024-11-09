@@ -33,7 +33,7 @@ public class DiaryEntryRepository : IDiaryEntryRepository
 
     public async Task<DiaryEntry?> GetByIdAsync(int entryId)
     {
-        var entity = await GetAsync(entry => entry.Id == entryId);
+        var entity = await GetAsync(filter: entry => entry.Id == entryId);
 
         return entity.FirstOrDefault();
     }
