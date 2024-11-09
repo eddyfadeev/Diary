@@ -12,47 +12,47 @@ public class DiaryEntriesController : Controller
 
     public DiaryEntriesController(IDiaryEntryRepository repository) => 
         _repository = repository;
-    // GET
+    
     public async Task<IActionResult> Index(
-        SortingOrder? sortOrder,
-        string? currentFilter,
-        string? searchString,
-        int? pageNumber)
+        int? page,
+        SortingOrder sort = SortingOrder.Descending,
+        string? search = null)
     {
         const int pageSize = 10;
         
-        ViewData["SortOrder"] = 
-            sortOrder is SortingOrder.Descending or null
-            ? SortingOrder.Ascending 
-            : SortingOrder.Descending;
+        ViewData["SortOrder"] = sort;
 
-        if (!string.IsNullOrEmpty(searchString))
+        if (string.IsNullOrWhiteSpace(search) && page is null)
         {
-            pageNumber = 1;
-        }
-        else
-        {
-            searchString = currentFilter;
+            page = 1;
         }
 
-        ViewData["AppliedFilter"] = searchString ?? string.Empty;
+        ViewData["AppliedFilter"] = search ?? string.Empty;
 
         Func<IQueryable<DiaryEntry>, IOrderedQueryable<DiaryEntry>> sortQuery = 
-            sortOrder is null or SortingOrder.Descending
-                ? q => q.OrderByDescending(e => e.Created)
-                : q => q.OrderBy(e => e.Created); 
+            sort is SortingOrder.Ascending
+                ? q => q.OrderBy(e => e.Created)
+                : q => q.OrderByDescending(e => e.Created);
         
         Expression<Func<DiaryEntry, bool>>? filterQuery = 
-            string.IsNullOrWhiteSpace(searchString) 
-                ? default 
-                : entry => entry.Content.Contains(searchString) || entry.Title.Contains(searchString);
+            string.IsNullOrWhiteSpace(search) 
+                ? null 
+                : entry => entry.Content.Contains(search) || entry.Title.Contains(search);
         
         var entries = await _repository.GetAsync(
             filter: filterQuery,
             orderBy: sortQuery
         );
         
-        return View(PaginatedList<DiaryEntry>.CreateAsync(entries, pageNumber ?? 1, pageSize));
+        Console.WriteLine($"Page: {page}, Search: {search}, Sort: {sort}");
+        
+        var paginatedList = PaginatedList<DiaryEntry>.Create(
+            entries, 
+            page ?? 1, 
+            pageSize
+        );
+        
+        return View(paginatedList);
     }
 
     [HttpGet]
