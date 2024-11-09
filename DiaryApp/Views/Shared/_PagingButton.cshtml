@@ -1,0 +1,18 @@
+﻿@model PagingButton
+
+@{
+    string activeStatus = Model.IsActive switch
+    {
+        true => string.Empty,
+        false => "disabled"
+    };
+}
+
+<a asp-action="Index"
+   asp-route-sortBy="@Model.SortingOrder"
+   asp-route-page="@Model.PageIndex"
+   asp-route-search="@Model.AppliedFilter"
+   class="btn btn-outline-info @activeStatus">
+    @Model.Name
+</a>
+

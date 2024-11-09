@@ -11,7 +11,7 @@
     @* Sorting by date column *@
     <th scope="col" class="col-2">
         <a asp-action="Index"
-           asp-route-sort="@(currentSort is SortingOrder.Ascending ? SortingOrder.Descending : SortingOrder.Ascending)"
+           asp-route-sortBy="@(currentSort is SortingOrder.Ascending ? SortingOrder.Descending : SortingOrder.Ascending)"
            asp-route-search="@ViewData["AppliedFilter"]"
            asp-route-page="1">
             Date

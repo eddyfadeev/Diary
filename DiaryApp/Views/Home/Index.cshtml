@@ -1,9 +1,8 @@
-﻿@model PaginatedList<DiaryEntry>
+﻿@using DiaryApp.Enums
+@model PaginatedList<DiaryEntry>
 
 @{
     ViewData["Title"] = "Diary Entries";
-    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
-    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
 }
 
 <div class="container">
@@ -27,7 +26,7 @@
                     <p>
                         <label>Filter: <input type="text" name="search" value="@ViewData["AppliedFilter"]"/></label>
                         <input type="submit" value="Search" class="btn btn-info btn-sm"/>
-                        <a asp-action="Index" asp-route-sort="@ViewData["SortOrder"]" class="btn btn-sm btn-dark">Reset</a>
+                        <a asp-action="Index" asp-route-sortBy="@ViewData["SortOrder"]" class="btn btn-sm btn-dark">Reset</a>
                     </p>
                 </div>
             </form>
@@ -52,23 +51,24 @@
             </tbody>
         </table>
     </div>
-    
-    <a asp-action="Index"
-        asp-route-sort="@ViewData["SortOrder"]"
-        asp-route-page="@(Model.PageIndex - 1)"
-        asp-route-search="@ViewData["AppliedFilter"]"
-        class="btn btn-outline-info @prevDisabled">
-        Previous
-    </a>
-    
-    <a asp-action="Index"
-        asp-route-sort="@ViewData["SortOrder"]"
-        asp-route-page="@(Model.PageIndex + 1)"
-        asp-route-search="@ViewData["AppliedFilter"]"
-        class="btn btn-outline-info @nextDisabled">
-        Next
-    </a>
-    
+
+    @await Html.PartialAsync("_PagingButton", new PagingButton
+    {
+        Name = "Previous",
+        SortingOrder = (SortingOrder)ViewData["SortOrder"]!,
+        PageIndex = Model.PageIndex - 1,
+        AppliedFilter = (ViewData["AppliedFilter"] as string)!,
+        IsActive = Model.HasPreviousPage
+    })
+
+    @await Html.PartialAsync("_PagingButton", new PagingButton
+    {
+        Name = "Next",
+        SortingOrder = (SortingOrder)ViewData["SortOrder"]!,
+        PageIndex = Model.PageIndex + 1,
+        AppliedFilter = (ViewData["AppliedFilter"] as string)!,
+        IsActive = Model.HasNextPage
+    })
 }
 else
 {
